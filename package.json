@@ -1,0 +1,22 @@
+{
+  "name": "chess-playing-ai",
+  "version": "1.0.0",
+  "description": "Uma inteligência artifial que joga xadrez com você!",
+  "main": "main.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LaylaCsAvila/chess-playing-ai.git"
+  },
+  "author": "Layla Ávila, Marlon Jardim, Ricardo Tavares",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LaylaCsAvila/chess-playing-ai/issues"
+  },
+  "homepage": "https://github.com/LaylaCsAvila/chess-playing-ai#readme",
+  "dependencies": {
+    "chess.js": "^0.10.2"
+  }
+}
