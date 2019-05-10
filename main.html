@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8"> 
-    <title>Chess</title>
+    <title>Xadrez</title>
     <link rel="stylesheet" href="css/chessboard-0.3.0.min.css">
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
     <script src="js/chessboard-0.3.0.min.js"></script>
@@ -11,5 +11,28 @@
   <body>
     <div id="tabuleiro" style="width: 400px"></div>
     <script type="module" src="./src/scripts.js"></script>
+    
+    <div class="info">
+        Profundidade da busca:
+        <select id="search-depth">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3" selected>3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+
+        <br>
+        <span>Posições avaliadas: <span id="position-count"></span></span>
+        <br>
+        <span>Tempo: <span id="time"></span></span>
+        <br>
+        <span>Posições/s: <span id="positions-per-s"></span> </span>
+        <br>
+        <br>
+        <div id="move-history" class="move-history">
+        </div>
+    </div>
+
   </body>
 </html>
