@@ -12,18 +12,6 @@ const movimentoComeca = function(source, piece, position, orientation) {
   }
 };
 
-// aqui fica a
-const fazMovimento = function() {
-  var possibleMoves = partida.moves();
-
-  // partida over
-  if (possibleMoves.length === 0) return;
-
-  var randomIndex = Math.floor(Math.random() * possibleMoves.length);
-  partida.move(possibleMoves[randomIndex]);
-  tabuleiro.position(partida.fen());
-};
-
 const aoLargar = function(origem, destino) {
   //  movimento realizado é legal? Se não for, desfaz
   var move = partida.move({
@@ -40,13 +28,46 @@ const aoLargar = function(origem, destino) {
 // atualiza o tabuleiro depois da jogada
 const movimentoTermina = function() { tabuleiro.position(partida.fen()); };
 
+// aqui fica a IA
+const fazMovimento = function() {
+  var possibleMoves = partida.moves();
+
+  // partida terminada
+  if (possibleMoves.length === 0) return;
+
+  // var randomIndex = Math.floor(Math.random() * possibleMoves.length);
+  var profundidade = 3;
+  var MelhorJogada = minimaxRaiz(partida, profundidade, true);
+  partida.move(MelhorJogada);
+  tabuleiro.position(partida.fen());
+};
+
+// função raiz do minimax, que retorna a melhor jogada encontrada
+var minimaxRaiz =function(partida, profundidade, EhJogadorMax) {
+
+  var possibilidades = partida.moves();
+  var MelhorJogada = -9999;
+  var MelhorJogadaEncontrada;
+
+  for(var i = 0; i < possibilidades.length; i++) {
+      var jogada = possibilidades[i];
+      partida.move(jogada);
+      var valor = minimax(partida, profundidade - 1, !EhJogadorMax);
+      partida.undo();
+      if(valor >= MelhorJogada) {
+          MelhorJogada = valor;
+          MelhorJogadaEncontrada = jogada;
+      }
+  }
+  return MelhorJogadaEncontrada;
+};
 
 // Função minimax com limite de profundidade + função heurística
-const minimaxProfundidade = function(partida, profundidade, maximiza){
+const minimax = function(partida, profundidade, EhJogadorMax){
   
   // Está no fundo? Se sim, faz a avaliação heurística
   if(profundidade == 0){
-    return -avaliacao(partida.board());
+    return -avaliaTabuleiro(partida.board());
   }
 
   // Monta todas as possibilidades de jogadas que a IA pode fazer
@@ -54,35 +75,35 @@ const minimaxProfundidade = function(partida, profundidade, maximiza){
   
   // É max? Se sim, maximiza o resultado.
   // Se não, minimiza o resultado.
-  if (maximiza){
+  if (EhJogadorMax){
 
-    // Seta alfa para o menor valor possível 
-    alfa = -9999;
+    // Seta MelhorJogada para o menor valor possível 
+    var MelhorJogada = -9999;
 
     // Percorre toda a lista de possibilidades
     for(var i = 0; i < possibilidades; i++){
-      partida.ugly_move(possibilidades[i]);
-      alfa = Math.max(alfa, minimaxProfundidade(possibilidades[i], profundidade - 1, !maximiza));
+      partida.move(possibilidades[i]);
+      MelhorJogada = Math.max(MelhorJogada, minimax(partida, profundidade - 1, !EhJogadorMax));
       partida.undo();
     }
-    return alfa;
+    return MelhorJogada;
 
   }else{
 
-    // Seta alfa para o maior valor possível 
-    alfa = 9999;
+    // Seta MelhorJogada para o maior valor possível 
+    var MelhorJogada = 9999;
 
     // Percorre toda a lista de possibilidades
     for(var i = 0; i < possibilidades; i++){
-      partida.ugly_move(possibilidades[i]);
-      alfa = Math.min(alfa, minimaxProfundidade(possibilidades[i], profundidade - 1, !maximiza ));
+      partida.move(possibilidades[i]);
+      MelhorJogada = Math.min(MelhorJogada, minimax(partida, profundidade - 1, !EhJogadorMax));
       partida.undo();
     }
-    return alfa;
+    return MelhorJogada;
   }
 };
 
-const avaliacao = function(tabuleiro){
+const avaliaTabuleiro = function(tabuleiro){
   const oito = 8;
   var total = 0;
 
