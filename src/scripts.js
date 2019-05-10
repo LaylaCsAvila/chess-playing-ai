@@ -36,7 +36,7 @@ const fazMovimento = function() {
   if (possibleMoves.length === 0) return;
 
   // var randomIndex = Math.floor(Math.random() * possibleMoves.length);
-  var profundidade = 3;
+  var profundidade = 2;
   var MelhorJogada = minimaxRaiz(partida, profundidade, true);
   partida.move(MelhorJogada);
   tabuleiro.position(partida.fen());
@@ -52,7 +52,11 @@ var minimaxRaiz =function(partida, profundidade, EhJogadorMax) {
   for(var i = 0; i < possibilidades.length; i++) {
       var jogada = possibilidades[i];
       partida.move(jogada);
-      var valor = minimax(partida, profundidade - 1, !EhJogadorMax);
+      // inicia os valores de alpha e beta com valores altos negativos e positivos
+      var alpha = -9999;
+      var beta = 9999;
+      //var valor = minimaxPoda(partida, alpha, beta, !EhJogadorMax);
+      var valor = minimaxProfundidade(partida, profundidade, true);
       partida.undo();
       if(valor >= MelhorJogada) {
           MelhorJogada = valor;
@@ -62,12 +66,65 @@ var minimaxRaiz =function(partida, profundidade, EhJogadorMax) {
   return MelhorJogadaEncontrada;
 };
 
-// Função minimax com limite de profundidade + função heurística
-const minimax = function(partida, profundidade, EhJogadorMax){
+// Função minimax com poda 
+const minimaxPoda = function(partida, alpha, beta, EhJogadorMax){
   
   // Está no fundo? Se sim, faz a avaliação heurística
-  if(profundidade == 0){
+  if(partida.in_checkmate() === true || partida.in_draw() === true){
+    console.log("chegou ao fundo");
     return -avaliaTabuleiro(partida.board());
+  }
+
+  // Monta todas as possibilidades de jogadas que a IA pode fazer
+  var possibilidades = partida.moves();
+  console.log("Eh jogador max? ", EhJogadorMax);
+  // É max? Se sim, maximiza o resultado.
+  // Se não, minimiza o resultado.
+  if (EhJogadorMax){
+
+    // Seta MelhorJogada para o menor valor possível 
+    var MelhorJogada = -9999;
+
+    console.log("ehjogadormax");
+    // Percorre toda a lista de possibilidades
+    for(var i = 0; i < possibilidades.length; i++){
+      partida.move(possibilidades[i]);
+      MelhorJogada = Math.max(MelhorJogada, minimaxPoda(partida, alpha, beta, !EhJogadorMax));
+      partida.undo();      
+      alpha = Math.max(alpha, MelhorJogada);
+      if (beta <= alpha) {
+          return MelhorJogada;
+      }
+    }
+    return MelhorJogada;
+
+  }else{
+    
+    console.log("N ehjogadormax");
+
+    // Seta MelhorJogada para o maior valor possível 
+    var MelhorJogada = 9999;
+
+    // Percorre toda a lista de possibilidades
+    for(var i = 0; i < possibilidades.length; i++){
+      partida.move(possibilidades[i]);
+      console.log("! Eh jogador max? ", !EhJogadorMax);
+      MelhorJogada = Math.min(MelhorJogada, minimaxPoda(partida, alpha, beta, !EhJogadorMax));
+      partida.undo();      
+      beta = Math.min(beta, MelhorJogada);
+      if (beta <= alpha) {
+          return MelhorJogada;
+      }
+    }
+    return MelhorJogada;
+  }
+};
+
+// Função minimax com limite de profundidade + função heurística
+const minimaxProfundidade = function(partida, profundidade, EhJogadorMax){
+  // Está no fundo? Se sim, faz a avaliação heurística
+  if(profundidade == 0){
+    return -avaliaTabuleiro(partida.board() );
   }
 
   // Monta todas as possibilidades de jogadas que a IA pode fazer
@@ -81,9 +138,9 @@ const minimax = function(partida, profundidade, EhJogadorMax){
     var MelhorJogada = -9999;
 
     // Percorre toda a lista de possibilidades
-    for(var i = 0; i < possibilidades; i++){
+    for(var i = 0; i < possibilidades.length; i++){
       partida.move(possibilidades[i]);
-      MelhorJogada = Math.max(MelhorJogada, minimax(partida, profundidade - 1, !EhJogadorMax));
+      MelhorJogada = Math.max(MelhorJogada, minimaxProfundidade(partida, profundidade - 1, !EhJogadorMax));
       partida.undo();
     }
     return MelhorJogada;
@@ -94,9 +151,9 @@ const minimax = function(partida, profundidade, EhJogadorMax){
     var MelhorJogada = 9999;
 
     // Percorre toda a lista de possibilidades
-    for(var i = 0; i < possibilidades; i++){
+    for(var i = 0; i < possibilidades.length; i++){
       partida.move(possibilidades[i]);
-      MelhorJogada = Math.min(MelhorJogada, minimax(partida, profundidade - 1, !EhJogadorMax));
+      MelhorJogada = Math.min(MelhorJogada, minimaxProfundidade(partida, profundidade - 1, !EhJogadorMax));
       partida.undo();
     }
     return MelhorJogada;
