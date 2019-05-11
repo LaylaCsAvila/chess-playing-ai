@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8"> 
+    <meta charset="UTF-8">
     <title>Xadrez</title>
     <link rel="stylesheet" href="css/chessboard-0.3.0.min.css">
     <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
@@ -11,7 +11,10 @@
   <body>
     <div id="tabuleiro" style="width: 400px"></div>
     <script type="module" src="./src/scripts.js"></script>
-    
+
+    <input type="button" id="jogoInicio" value="Começar" />
+    <input type="button" id="jogoLimpar" value="Limpar" />
+
     <div class="info">
         Profundidade da busca:
         <select id="search-depth">
@@ -20,6 +23,12 @@
             <option value="3" selected>3</option>
             <option value="4">4</option>
             <option value="5">5</option>
+        </select>
+
+        Algoritmo:
+        <select id="search-function">
+            <option value="poda">MinMax com poda</option>
+            <option value="heuristica">MinMax com função heurística</option>
         </select>
 
         <br>

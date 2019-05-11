@@ -51,7 +51,7 @@ const fazMovimento = function() {
   $('#position-count').text(contadorDePosicoes);
   $('#time').text(tempoDeJogada/1000 + 's');
   $('#positions-per-s').text(posicoesPorSeg);
-  
+
   partida.ugly_move(MelhorJogada);
   tabuleiro.position(partida.fen());
 };
@@ -80,7 +80,7 @@ var minimaxRaiz =function(partida, profundidade, EhJogadorMax) {
   return MelhorJogadaEncontrada;
 };
 
-// Função minimax com poda 
+// Função minimax com poda
 const minimaxPoda = function(partida, profundidade, alpha, beta, EhJogadorMax){
   contadorDePosicoes++;
   // Está no fundo? Se sim, faz a avaliação de utilidade
@@ -94,14 +94,14 @@ const minimaxPoda = function(partida, profundidade, alpha, beta, EhJogadorMax){
   // Se não, minimiza o resultado.
   if (EhJogadorMax){
 
-    // Seta MelhorJogada para o menor valor possível 
+    // Seta MelhorJogada para o menor valor possível
     var MelhorJogada = -9999;
-     
+
     // Percorre toda a lista de possibilidades
     for(var i = 0; i < possibilidades.length; i++){
       partida.ugly_move(possibilidades[i]);
       MelhorJogada = Math.max(MelhorJogada, minimaxPoda(partida, profundidade - 1, alpha, beta, !EhJogadorMax));
-      partida.undo();      
+      partida.undo();
       alpha = Math.max(alpha, MelhorJogada);
       if (beta <= alpha) {
           return MelhorJogada;
@@ -111,14 +111,14 @@ const minimaxPoda = function(partida, profundidade, alpha, beta, EhJogadorMax){
 
   }else{
 
-    // Seta MelhorJogada para o maior valor possível 
+    // Seta MelhorJogada para o maior valor possível
     var MelhorJogada = 9999;
 
     // Percorre toda a lista de possibilidades
     for(var i = 0; i < possibilidades.length; i++){
       partida.ugly_move(possibilidades[i]);
       MelhorJogada = Math.min(MelhorJogada, minimaxPoda(partida, profundidade - 1, alpha, beta, !EhJogadorMax));
-      partida.undo();      
+      partida.undo();
       beta = Math.min(beta, MelhorJogada);
       if (beta <= alpha) {
           return MelhorJogada;
@@ -138,12 +138,12 @@ const minimaxProfundidade = function(partida, profundidade, EhJogadorMax){
 
   // Monta todas as possibilidades de jogadas que a IA pode fazer
   var possibilidades = partida.ugly_moves();
-  
+
   // É max? Se sim, maximiza o resultado.
   // Se não, minimiza o resultado.
   if (EhJogadorMax){
 
-    // Seta MelhorJogada para o menor valor possível 
+    // Seta MelhorJogada para o menor valor possível
     var MelhorJogada = -9999;
 
     // Percorre toda a lista de possibilidades
@@ -156,7 +156,7 @@ const minimaxProfundidade = function(partida, profundidade, EhJogadorMax){
 
   }else{
 
-    // Seta MelhorJogada para o maior valor possível 
+    // Seta MelhorJogada para o maior valor possível
     var MelhorJogada = 9999;
 
     // Percorre toda a lista de possibilidades
@@ -175,7 +175,7 @@ const avaliaTabuleiro = function(tabuleiro){
 
   for (var i = 0; i < oito; i++){
     for(var j = 0; j < oito; j++){
-      total += valorPeca(tabuleiro[i][j]); 
+      total += valorPeca(tabuleiro[i][j]);
     }
   }
   return total;
@@ -191,11 +191,11 @@ const valorPeca = function(peca){
     case 'p':
       valor = 10;
       break;
-    
+
     case 'r':
       valor = 50;
       break;
-    
+
     case 'n':
       valor = 30;
       break;
@@ -219,12 +219,20 @@ const valorPeca = function(peca){
   return peca.color == 'w' ? valor : -valor;
 };
 
+const reiniciar = function() {
+  tabuleiro.clear();
+  $('#position-count').text('0');
+  $('#time').text('0s');
+  $('#positions-per-s').text('0');
+}
+
 // configurações constantes e retorno do tabuleiro modificável
 const config = {
-  position: 'start',
   draggable: true,
   onDragStart: movimentoComeca,
   onDrop: aoLargar,
   onSnapEnd: movimentoTermina,
 }
 tabuleiro = ChessBoard('tabuleiro', config);
+$('#jogoInicio').on('click', tabuleiro.start);
+$('#jogoLimpar').on('click', reiniciar);
