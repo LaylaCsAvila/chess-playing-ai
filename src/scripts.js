@@ -39,10 +39,11 @@ const fazMovimento = function() {
   contadorDePosicoes = 0;
 
   var profundidade = parseInt($('#search-depth').find(':selected').text());
+  const minimaxTipo = document.getElementById('search-function').value;
 
   var d = new Date().getTime();
 
-  var MelhorJogada = minimaxRaiz(partida, profundidade, true);
+  var MelhorJogada = minimaxRaiz(partida, profundidade, true, minimaxTipo);
 
   var d2 = new Date().getTime();
   var tempoDeJogada = (d2 - d);
@@ -57,7 +58,7 @@ const fazMovimento = function() {
 };
 
 // função raiz do minimax, que retorna a melhor jogada encontrada
-var minimaxRaiz =function(partida, profundidade, EhJogadorMax) {
+var minimaxRaiz =function(partida, profundidade, EhJogadorMax, qualMinMax) {
 
   var possibilidades = partida.ugly_moves();
   var MelhorJogada = -9999;
@@ -69,8 +70,13 @@ var minimaxRaiz =function(partida, profundidade, EhJogadorMax) {
       // inicia os valores de alpha e beta com o mínimo e máximo
       var alpha = -10000;
       var beta = 10000;
-      var valor = minimaxPoda(partida, profundidade - 1, alpha, beta, !EhJogadorMax);
-      //var valor = minimaxProfundidade(partida, profundidade-1, !EhJogadorMax);
+      let valor;
+      if(qualMinMax === "1") {
+        valor = minimaxPoda(partida, profundidade - 1, alpha, beta, !EhJogadorMax);
+      }
+      if(qualMinMax === "2") {
+        valor = minimaxProfundidade(partida, profundidade-1, !EhJogadorMax);
+      }
       partida.undo();
       if(valor >= MelhorJogada) {
           MelhorJogada = valor;
