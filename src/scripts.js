@@ -39,7 +39,7 @@ const fazMovimento = function() {
   contadorDePosicoes = 0;
 
   var profundidade = parseInt($('#search-depth').find(':selected').text());
-  const minimaxTipo = document.getElementById('search-function').value;
+  const minimaxTipo = parseInt($('#search-function').find(':selected').val());
 
   var d = new Date().getTime();
 
@@ -57,9 +57,9 @@ const fazMovimento = function() {
   tabuleiro.position(partida.fen());
 };
 
-// função raiz do minimax, que retorna a melhor jogada encontrada
+// função raiz do minimax, que retorna a melhor jogada encontrada depois de decidir
+// qual algoritmo usar
 var minimaxRaiz =function(partida, profundidade, EhJogadorMax, qualMinMax) {
-
   var possibilidades = partida.ugly_moves();
   var MelhorJogada = -9999;
   var MelhorJogadaEncontrada;
@@ -71,10 +71,10 @@ var minimaxRaiz =function(partida, profundidade, EhJogadorMax, qualMinMax) {
       var alpha = -10000;
       var beta = 10000;
       let valor;
-      if(qualMinMax === "1") {
+      if(qualMinMax === 1) {
         valor = minimaxPoda(partida, profundidade - 1, alpha, beta, !EhJogadorMax);
       }
-      if(qualMinMax === "2") {
+      if(qualMinMax === 2) {
         valor = minimaxProfundidade(partida, profundidade-1, !EhJogadorMax);
       }
       partida.undo();
@@ -225,11 +225,13 @@ const valorPeca = function(peca){
   return peca.color == 'w' ? valor : -valor;
 };
 
+// reinicia o tabuleiro e limpa os dados de jogo
 const reiniciar = function() {
   tabuleiro.clear();
   $('#position-count').text('0');
   $('#time').text('0s');
   $('#positions-per-s').text('0');
+  tabuleiro.start();
 }
 
 // configurações constantes e retorno do tabuleiro modificável
