@@ -227,10 +227,10 @@ const valorPeca = function(peca){
 
 // reinicia o tabuleiro e limpa os dados de jogo
 const reiniciar = function() {
-  tabuleiro.clear();
   $('#position-count').text('0');
   $('#time').text('0s');
-  $('#positions-per-s').text('0');
+  $('#positions-per-s').text('0');  
+  partida.reset();
   tabuleiro.start();
 }
 
