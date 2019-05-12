@@ -4,7 +4,7 @@ let tabuleiro;
 
 let minimaxTipo = 1;
 
-// impede que o computador jogue se:
+// impede que o humano jogue se:
 // não for a vez das brancas
 // o jogo acabou
 const movimentoComeca = function(source, piece, position, orientation) {
@@ -28,16 +28,16 @@ const aoLargar = function(origem, destino) {
 };
 
 const jogoAutomatico = function() {
-  let counter = 3;
-  // chama a IA para jogar no turno das peças pretas
-  //while (!partida.in_checkmate() || !partida.in_draw()) {
-  //while(counter) {
-    console.log("Minimaxtipo", minimaxTipo);
+  let counter = 2;
+  // chama a IA para jogar
     window.setTimeout(fazMovimento(minimaxTipo), 250);
+    
     if (minimaxTipo == 1) minimaxTipo = 2;
-    else minimaxTipo = 1;    
-    //counter--;
-  //}
+    else minimaxTipo = 1;
+    
+    if (!partida.in_checkmate() || !partida.in_draw()){
+      window.setTimeout(jogoAutomatico,500);
+    }
 }
 
 // atualiza o tabuleiro depois da jogada
@@ -190,54 +190,124 @@ const minimaxProfundidade = function(partida, profundidade, EhJogadorMax){
   }
 };
 
-const avaliaTabuleiro = function(tabuleiro){
-  const oito = 8;
-  var total = 0;
 
-  for (var i = 0; i < oito; i++){
-    for(var j = 0; j < oito; j++){
-      total += valorPeca(tabuleiro[i][j]);
-    }
+
+var avaliaTabuleiro = function (tabuleiro) {
+  var avaliacaoTotal = 0;
+  for (var i = 0; i < 8; i++) {
+      for (var j = 0; j < 8; j++) {
+          avaliacaoTotal = avaliacaoTotal + valorPeca(tabuleiro[i][j], i ,j);
+      }
   }
-  return total;
-
+  return avaliacaoTotal;
 };
 
-const valorPeca = function(peca){
-  if(peca == null){
-    return 0;
-  }
-  var valor;
-  switch(peca.type){
-    case 'p':
-      valor = 10;
-      break;
+var reverteMatriz = function(matriz) {
+  return matriz.slice().reverse();
+};
 
-    case 'r':
-      valor = 50;
-      break;
+var avalPeaoBranca =
+  [
+      [0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0],
+      [5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0,  5.0],
+      [1.0,  1.0,  2.0,  3.0,  3.0,  2.0,  1.0,  1.0],
+      [0.5,  0.5,  1.0,  2.5,  2.5,  1.0,  0.5,  0.5],
+      [0.0,  0.0,  0.0,  2.0,  2.0,  0.0,  0.0,  0.0],
+      [0.5, -0.5, -1.0,  0.0,  0.0, -1.0, -0.5,  0.5],
+      [0.5,  1.0, 1.0,  -2.0, -2.0,  1.0,  1.0,  0.5],
+      [0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0]
+  ];
 
-    case 'n':
-      valor = 30;
-      break;
+var avalPeaolPreta = reverteMatriz(avalPeaoBranca);
 
-    case 'b':
-      valor = 30;
-      break;
+var avalCavalo =
+  [
+      [-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0],
+      [-4.0, -2.0,  0.0,  0.0,  0.0,  0.0, -2.0, -4.0],
+      [-3.0,  0.0,  1.0,  1.5,  1.5,  1.0,  0.0, -3.0],
+      [-3.0,  0.5,  1.5,  2.0,  2.0,  1.5,  0.5, -3.0],
+      [-3.0,  0.0,  1.5,  2.0,  2.0,  1.5,  0.0, -3.0],
+      [-3.0,  0.5,  1.0,  1.5,  1.5,  1.0,  0.5, -3.0],
+      [-4.0, -2.0,  0.0,  0.5,  0.5,  0.0, -2.0, -4.0],
+      [-5.0, -4.0, -3.0, -3.0, -3.0, -3.0, -4.0, -5.0]
+  ];
 
-    case 'q':
-      valor = 90;
-      break;
+var avalBispoBranca = [
+  [ -2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0],
+  [ -1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0],
+  [ -1.0,  0.0,  0.5,  1.0,  1.0,  0.5,  0.0, -1.0],
+  [ -1.0,  0.5,  0.5,  1.0,  1.0,  0.5,  0.5, -1.0],
+  [ -1.0,  0.0,  1.0,  1.0,  1.0,  1.0,  0.0, -1.0],
+  [ -1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0, -1.0],
+  [ -1.0,  0.5,  0.0,  0.0,  0.0,  0.0,  0.5, -1.0],
+  [ -2.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0]
+];
 
-    case 'k':
-      valor = 900;
-      break;
+var avalBispoPreta = reverteMatriz(avalBispoBranca);
 
-    default:
-      valor = "Peça incomum: "+ peca.type;
-  }
+var avalTorreBranca = [
+  [  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0],
+  [  0.5,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  0.5],
+  [ -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5],
+  [ -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5],
+  [ -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5],
+  [ -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5],
+  [ -0.5,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -0.5],
+  [  0.0,   0.0, 0.0,  0.5,  0.5,  0.0,  0.0,  0.0]
+];
 
-  return peca.color == 'w' ? valor : -valor;
+var avalTorrePreta = reverteMatriz(avalTorreBranca);
+
+var avalRainha =
+  [
+  [ -2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0],
+  [ -1.0,  0.0,  0.0,  0.0,  0.0,  0.0,  0.0, -1.0],
+  [ -1.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -1.0],
+  [ -0.5,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5],
+  [  0.0,  0.0,  0.5,  0.5,  0.5,  0.5,  0.0, -0.5],
+  [ -1.0,  0.5,  0.5,  0.5,  0.5,  0.5,  0.0, -1.0],
+  [ -1.0,  0.0,  0.5,  0.0,  0.0,  0.0,  0.0, -1.0],
+  [ -2.0, -1.0, -1.0, -0.5, -0.5, -1.0, -1.0, -2.0]
+];
+
+var avalReiBranca = [
+
+  [ -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0],
+  [ -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0],
+  [ -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0],
+  [ -3.0, -4.0, -4.0, -5.0, -5.0, -4.0, -4.0, -3.0],
+  [ -2.0, -3.0, -3.0, -4.0, -4.0, -3.0, -3.0, -2.0],
+  [ -1.0, -2.0, -2.0, -2.0, -2.0, -2.0, -2.0, -1.0],
+  [  2.0,  2.0,  0.0,  0.0,  0.0,  0.0,  2.0,  2.0 ],
+  [  2.0,  3.0,  1.0,  0.0,  0.0,  1.0,  3.0,  2.0 ]
+];
+
+var avalReiPreta = reverteMatriz(avalReiBranca);
+
+
+var valorPeca = function (peca, x, y) {
+    if (peca === null) {
+        return 0;
+    }
+    var pegaValorAbsoluto = function (peca, ehBranca, x ,y) {
+        if (peca.type === 'p') {
+            return 10 + ( ehBranca ? avalPeaoBranca[y][x] : avalPeaolPreta[y][x] );
+        } else if (peca.type === 'r') {
+            return 50 + ( ehBranca ? avalTorreBranca[y][x] : avalTorrePreta[y][x] );
+        } else if (peca.type === 'n') {
+            return 30 + avalCavalo[y][x];
+        } else if (peca.type === 'b') {
+            return 30 + ( ehBranca ? avalBispoBranca[y][x] : avalBispoPreta[y][x] );
+        } else if (peca.type === 'q') {
+            return 90 + avalRainha[y][x];
+        } else if (peca.type === 'k') {
+            return 900 + ( ehBranca ? avalReiBranca[y][x] : avalReiPreta[y][x] );
+        }
+        throw "Peça desconhecida : " + peca.type;
+    };
+
+    var valorAbsoluto = pegaValorAbsoluto(peca, peca.color === 'w', x ,y);
+    return peca.color === 'w' ? valorAbsoluto : -valorAbsoluto;
 };
 
 // reinicia o tabuleiro e limpa os dados de jogo
