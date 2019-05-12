@@ -2,6 +2,8 @@
 const partida = new Chess();
 let tabuleiro;
 
+let minimaxTipo = 1;
+
 // impede que o computador jogue se:
 // não for a vez das brancas
 // o jogo acabou
@@ -25,13 +27,26 @@ const aoLargar = function(origem, destino) {
   window.setTimeout(fazMovimento, 250);
 };
 
+const jogoAutomatico = function() {
+  let counter = 3;
+  // chama a IA para jogar no turno das peças pretas
+  //while (!partida.in_checkmate() || !partida.in_draw()) {
+  //while(counter) {
+    console.log("Minimaxtipo", minimaxTipo);
+    window.setTimeout(fazMovimento(minimaxTipo), 250);
+    if (minimaxTipo == 1) minimaxTipo = 2;
+    else minimaxTipo = 1;    
+    //counter--;
+  //}
+}
+
 // atualiza o tabuleiro depois da jogada
 const movimentoTermina = function() { tabuleiro.position(partida.fen()); };
 
 var contadorDePosicoes;
 
 // aqui fica a IA
-const fazMovimento = function() {
+const fazMovimento = function(minimaxTipo) {
   var possibleMoves = partida.ugly_moves();
 
   // partida terminada
@@ -39,7 +54,7 @@ const fazMovimento = function() {
   contadorDePosicoes = 0;
 
   var profundidade = parseInt($('#search-depth').find(':selected').text());
-  const minimaxTipo = parseInt($('#search-function').find(':selected').val());
+  //const minimaxTipo = parseInt($('#search-function').find(':selected').val());
 
   var d = new Date().getTime();
 
@@ -139,7 +154,7 @@ const minimaxProfundidade = function(partida, profundidade, EhJogadorMax){
   contadorDePosicoes++;
   // Está no fundo? Se sim, faz a avaliação heurística
   if(profundidade == 0){
-    return -avaliaTabuleiro(partida.board() );
+    return avaliaTabuleiro(partida.board() );
   }
 
   // Monta todas as possibilidades de jogadas que a IA pode fazer
@@ -237,10 +252,11 @@ const reiniciar = function() {
 // configurações constantes e retorno do tabuleiro modificável
 const config = {
   draggable: true,
+  position: 'start',
   onDragStart: movimentoComeca,
   onDrop: aoLargar,
   onSnapEnd: movimentoTermina,
 }
 tabuleiro = ChessBoard('tabuleiro', config);
-$('#jogoInicio').on('click', tabuleiro.start);
+$('#jogoInicio').on('click', jogoAutomatico);
 $('#jogoLimpar').on('click', reiniciar);
